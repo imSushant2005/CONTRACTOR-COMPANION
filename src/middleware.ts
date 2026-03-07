@@ -25,7 +25,7 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   if (isApp) {
-    ; (await auth()).protect()
+    await auth.protect()
   }
 
   return NextResponse.next()

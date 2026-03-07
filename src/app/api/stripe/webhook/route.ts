@@ -16,7 +16,7 @@ export async function POST(req: Request) {
         return new NextResponse('Webhook signature invalid', { status: 400 })
     }
 
-    const sub = event.data.object as Stripe.Subscription
+    const sub = event.data.object as any
     const tenantId = sub.metadata?.tenantId
     if (!tenantId) return new NextResponse('No tenantId', { status: 400 })
 
