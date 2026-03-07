@@ -15,7 +15,7 @@ export default async function LeadsPage() {
         orderBy: { order: 'asc' }
     })
 
-    const stageNames = stages.map(s => s.name)
+    const stageNames = stages.map((s: { name: string }) => s.name)
 
     return (
         <div className="space-y-6">
