@@ -94,7 +94,7 @@ function getMockResponse(answers: any) {
 }
 
 export async function generateTenantConfig(tenantInfo: { businessName: string, slug: string }, answers: any) {
-    const { userId } = auth()
+    const { userId } = await auth()
     const clerkUser = await currentUser()
     if (!userId || !clerkUser) throw new Error('Unauthorized')
 
