@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Tenant {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  businessName   String
+  industry       String   @default("HVAC")
+  country        String?
+  currency       String   @default("USD")
+  createdAt      DateTime @default(now())
+  users          User[]
+  leads          Lead[]
+  pipelineStages PipelineStage[]
+  quotes         Quote[]
+  invoices       Invoice[]
+  config         TenantConfig?
+  subscription   StripeSubscription?
+}
+
+model User {
+  id                 String   @id @default(cuid())
+  tenantId           String
+  tenant             Tenant   @relation(fields: [tenantId], references: [id])
+  authProviderUserId String   @unique  // Clerk user ID
+  email              String
+  role               String   @default("OWNER")
+  createdAt          DateTime @default(now())
+}
+
+model Lead {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  name          String
+  phone         String?
+  email         String?
+  address       String?
+  serviceType   String?
+  source        String?
+  status        String   @default("New")
+  valueEstimate Float?
+  notes         String?
+  createdAt     DateTime @default(now())
+  quotes        Quote[]
+  invoices      Invoice[]
+  
+  @@index([tenantId, createdAt])
+}
+
+model PipelineStage {
+  id       String @id @default(cuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+  name     String
+  order    Int
+}
+
+model Quote {
+  id         String      @id @default(cuid())
+  tenantId   String
+  tenant     Tenant      @relation(fields: [tenantId], references: [id])
+  leadId     String
+  lead       Lead        @relation(fields: [leadId], references: [id])
+  status     String      @default("Draft")
+  taxPercent Float       @default(0)
+  subtotal   Float       @default(0)
+  tax        Float       @default(0)
+  total      Float       @default(0)
+  createdAt  DateTime    @default(now())
+  items      QuoteItem[]
+  invoice    Invoice?
+  
+  @@index([tenantId, createdAt])
+}
+
+model QuoteItem {
+  id          String @id @default(cuid())
+  quoteId     String
+  quote       Quote  @relation(fields: [quoteId], references: [id])
+  description String
+  quantity    Float
+  unitPrice   Float
+  lineTotal   Float
+}
+
+model Invoice {
+  id        String    @id @default(cuid())
+  tenantId  String
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  leadId    String
+  lead      Lead      @relation(fields: [leadId], references: [id])
+  quoteId   String?   @unique
+  quote     Quote?    @relation(fields: [quoteId], references: [id])
+  status    String    @default("Unpaid")
+  subtotal  Float
+  tax       Float
+  total     Float
+  paidAt    DateTime?
+  createdAt DateTime  @default(now())
+  
+  @@index([tenantId, createdAt])
+}
+
+model TenantConfig {
+  id                  String @id @default(cuid())
+  tenantId            String @unique
+  tenant              Tenant @relation(fields: [tenantId], references: [id])
+  aiProfileJson       String?
+  quoteTemplateJson   String?
+  invoiceTemplateJson String?
+}
+
+model StripeSubscription {
+  id                   String   @id @default(cuid())
+  tenantId             String   @unique
+  tenant               Tenant   @relation(fields: [tenantId], references: [id])
+  stripeCustomerId     String
+  stripeSubscriptionId String
+  status               String
+  currentPeriodEnd     DateTime
+}
