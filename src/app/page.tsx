@@ -1,15 +1,24 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { auth } from '@clerk/nextjs/server'
 
-export default function MarketingPage() {
+export default async function MarketingPage() {
+  const { userId } = await auth()
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <header className="px-6 h-16 flex items-center justify-between border-b bg-white relative z-10">
         <div className="font-bold text-xl tracking-tight text-blue-600">Contractor Companion</div>
         <div className="flex space-x-4">
           <Link href="/pricing" className="text-sm font-medium text-slate-600 hover:text-slate-900 mt-2">Pricing</Link>
-          <Button variant="outline" asChild><Link href="/sign-in">Login</Link></Button>
-          <Button asChild><Link href="/sign-up">Start Free Trial</Link></Button>
+          {userId ? (
+            <Button asChild><Link href="/app/dashboard">Enter App</Link></Button>
+          ) : (
+            <>
+              <Button variant="outline" asChild><Link href="/sign-in">Login</Link></Button>
+              <Button asChild><Link href="/sign-up">Start Free Trial</Link></Button>
+            </>
+          )}
         </div>
       </header>
 
