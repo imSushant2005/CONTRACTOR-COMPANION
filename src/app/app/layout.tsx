@@ -11,8 +11,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     try {
         const result = await getCurrentTenant()
         tenantId = result.tenantId
-    } catch {
-        // Not logged in or user not found — Clerk will handle redirect
+    } catch (error: any) {
+        if (error.message === 'User not found') {
+            redirect('/onboarding')
+        }
+        // Not logged in
         redirect('/sign-in')
     }
 

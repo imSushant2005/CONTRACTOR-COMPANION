@@ -34,7 +34,9 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.rewrite(new URL(`/lead-form/${slug}${req.nextUrl.pathname}`, req.url))
   }
 
-  if (isApp) {
+  const isOnboarding = req.nextUrl.pathname.startsWith('/onboarding')
+
+  if (isApp || isOnboarding) {
     await auth.protect()
   }
 

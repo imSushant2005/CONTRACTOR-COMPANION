@@ -15,6 +15,7 @@ model Tenant {
   country        String?
   currency       String              @default("USD")
   isActive       Boolean             @default(true)
+  createdAt      DateTime            @default(now())
   updatedAt      DateTime            @default(now()) @updatedAt
   users          User[]
   leads          Lead[]
