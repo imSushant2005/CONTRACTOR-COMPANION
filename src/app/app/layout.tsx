@@ -4,13 +4,19 @@ import { UserButton } from '@clerk/nextjs'
 import { LayoutDashboard, Users, Trello, FileText, FileSpreadsheet, Settings } from 'lucide-react'
 import { getCurrentTenant } from '@/lib/get-tenant'
 import { prisma } from '@/lib/prisma'
+import { TenantSwitcher } from '@/components/tenant-switcher'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
     // Subscription gate — redirect if no active/trialing subscription
     let tenantId: string
+    let activeTenant: any
+    let availableTenants: any[] = []
+
     try {
         const result = await getCurrentTenant()
         tenantId = result.tenantId
+        activeTenant = result.tenant
+        availableTenants = result.availableTenants
     } catch (error: any) {
         if (error.message === 'User not found') {
             redirect('/onboarding')
@@ -43,8 +49,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
             {/* Desktop sidebar */}
             <aside className="hidden md:flex md:flex-col md:w-60 bg-white border-r border-gray-200 fixed inset-y-0 left-0 z-30">
-                <div className="h-16 flex items-center px-6 border-b border-gray-200">
-                    <span className="font-bold text-lg">Contractor CRM</span>
+                <div className="h-16 flex items-center px-4 border-b border-gray-200">
+                    <TenantSwitcher activeTenant={activeTenant} availableTenants={availableTenants} />
                 </div>
                 <nav className="p-4 space-y-1 flex-1">
                     {navItems.map((item) => (

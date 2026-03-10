@@ -111,11 +111,12 @@ export async function generateTenantConfig(tenantInfo: { businessName: string, s
     }
 
     // Check if user already has a tenant (re-onboarding scenario)
-    const existingUser = await prisma.user.findUnique({
+    const existingUsers = await prisma.user.findMany({
         where: { authProviderUserId: userId }
     })
-    if (existingUser) {
-        return { success: true, alreadyOnboarded: true }
+
+    if (existingUsers.length >= 2) {
+        throw new Error('You have reached the maximum limit of 2 businesses.')
     }
 
     const userEmail = clerkUser.emailAddresses[0]?.emailAddress || 'no-email@example.com'
@@ -181,5 +182,5 @@ export async function generateTenantConfig(tenantInfo: { businessName: string, s
         }
     })
 
-    return { success: true }
+    return { success: true, alreadyOnboarded: false }
 }

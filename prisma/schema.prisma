@@ -30,12 +30,15 @@ model User {
   id                 String   @id @default(cuid())
   tenantId           String
   tenant             Tenant   @relation(fields: [tenantId], references: [id])
-  authProviderUserId String   @unique // Clerk user ID
+  authProviderUserId String // Clerk user ID (no longer unique to allow multi-tenant)
   email              String
   role               String   @default("OWNER")
   createdAt          DateTime @default(now())
   isActive           Boolean  @default(true)
   updatedAt          DateTime @default(now()) @updatedAt
+
+  @@unique([authProviderUserId, tenantId])
+  @@index([authProviderUserId])
 }
 
 model Lead {
