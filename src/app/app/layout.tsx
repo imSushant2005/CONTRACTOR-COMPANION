@@ -21,7 +21,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
     const sub = await prisma.stripeSubscription.findUnique({ where: { tenantId } })
     const isActive = sub && ['active', 'trialing'].includes(sub.status)
-    const bypassGate = process.env.NODE_ENV === 'development' || process.env.BYPASS_SUBSCRIPTION_GATE === 'true'
+    // Temporarily bypass gate for MVP / Prototype phase
+    const bypassGate = true // process.env.NODE_ENV === 'development' || process.env.BYPASS_SUBSCRIPTION_GATE === 'true'
     if (!isActive && !bypassGate) {
         redirect('/pricing')
     }
