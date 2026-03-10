@@ -110,6 +110,14 @@ export async function generateTenantConfig(tenantInfo: { businessName: string, s
         throw new Error('Slug is already taken.')
     }
 
+    // Check if user already has a tenant (re-onboarding scenario)
+    const existingUser = await prisma.user.findUnique({
+        where: { authProviderUserId: userId }
+    })
+    if (existingUser) {
+        return { success: true, alreadyOnboarded: true }
+    }
+
     const userEmail = clerkUser.emailAddresses[0]?.emailAddress || 'no-email@example.com'
 
     const tenant = await prisma.tenant.create({

@@ -40,9 +40,14 @@ export default function OnboardingPage() {
     const handleSubmit = async () => {
         setLoading(true)
         try {
-            await generateTenantConfig({ businessName, slug }, {
+            const result = await generateTenantConfig({ businessName, slug }, {
                 services, emergency, teamSize, avgJobValue, serviceArea, leadSources, salesSteps
             })
+            // If user already onboarded, go straight to dashboard
+            if (result.alreadyOnboarded) {
+                router.push('/app/dashboard')
+                return
+            }
             // Redirect to Stripe checkout
             const res = await fetch('/api/stripe/checkout', { method: 'POST' })
             if (!res.ok) throw new Error('Stripe setup failed.')
