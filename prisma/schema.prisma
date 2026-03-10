@@ -15,7 +15,7 @@ model Tenant {
   country        String?
   currency       String              @default("USD")
   isActive       Boolean             @default(true)
-  updatedAt      DateTime            @updatedAt
+  updatedAt      DateTime            @default(now()) @updatedAt
   users          User[]
   leads          Lead[]
   pipelineStages PipelineStage[]
@@ -34,7 +34,7 @@ model User {
   role               String   @default("OWNER")
   createdAt          DateTime @default(now())
   isActive           Boolean  @default(true)
-  updatedAt          DateTime @updatedAt
+  updatedAt          DateTime @default(now()) @updatedAt
 }
 
 model Lead {
@@ -51,7 +51,7 @@ model Lead {
   valueEstimate Float?
   notes         String?
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  updatedAt     DateTime  @default(now()) @updatedAt
   quotes        Quote[]
   invoices      Invoice[]
 
@@ -79,7 +79,7 @@ model Quote {
   total      Float       @default(0)
   createdAt  DateTime    @default(now())
   expiresAt  DateTime?
-  updatedAt  DateTime    @updatedAt
+  updatedAt  DateTime    @default(now()) @updatedAt
   items      QuoteItem[]
   invoice    Invoice?
 
@@ -111,7 +111,7 @@ model Invoice {
   paidAt    DateTime?
   createdAt DateTime  @default(now())
   dueDate   DateTime?
-  updatedAt DateTime  @updatedAt
+  updatedAt DateTime  @default(now()) @updatedAt
 
   @@index([tenantId, createdAt])
 }
