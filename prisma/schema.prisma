@@ -7,15 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model Tenant {
-  id             String   @id @default(cuid())
-  slug           String   @unique
+  id             String              @id @default(cuid())
+  slug           String              @unique
   businessName   String
-  industry       String   @default("HVAC")
+  industry       String              @default("HVAC")
   country        String?
-  currency       String   @default("USD")
-  createdAt      DateTime @default(now())
+  currency       String              @default("USD")
+  isActive       Boolean             @default(true)
+  updatedAt      DateTime            @updatedAt
   users          User[]
   leads          Lead[]
   pipelineStages PipelineStage[]
@@ -29,29 +29,32 @@ model User {
   id                 String   @id @default(cuid())
   tenantId           String
   tenant             Tenant   @relation(fields: [tenantId], references: [id])
-  authProviderUserId String   @unique  // Clerk user ID
+  authProviderUserId String   @unique // Clerk user ID
   email              String
   role               String   @default("OWNER")
   createdAt          DateTime @default(now())
+  isActive           Boolean  @default(true)
+  updatedAt          DateTime @updatedAt
 }
 
 model Lead {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   tenantId      String
-  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
   name          String
   phone         String?
   email         String?
   address       String?
   serviceType   String?
   source        String?
-  status        String   @default("New")
+  status        String    @default("New")
   valueEstimate Float?
   notes         String?
-  createdAt     DateTime @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   quotes        Quote[]
   invoices      Invoice[]
-  
+
   @@index([tenantId, createdAt])
 }
 
@@ -75,9 +78,11 @@ model Quote {
   tax        Float       @default(0)
   total      Float       @default(0)
   createdAt  DateTime    @default(now())
+  expiresAt  DateTime?
+  updatedAt  DateTime    @updatedAt
   items      QuoteItem[]
   invoice    Invoice?
-  
+
   @@index([tenantId, createdAt])
 }
 
@@ -105,14 +110,16 @@ model Invoice {
   total     Float
   paidAt    DateTime?
   createdAt DateTime  @default(now())
-  
+  dueDate   DateTime?
+  updatedAt DateTime  @updatedAt
+
   @@index([tenantId, createdAt])
 }
 
 model TenantConfig {
-  id                  String @id @default(cuid())
-  tenantId            String @unique
-  tenant              Tenant @relation(fields: [tenantId], references: [id])
+  id                  String  @id @default(cuid())
+  tenantId            String  @unique
+  tenant              Tenant  @relation(fields: [tenantId], references: [id])
   aiProfileJson       String?
   quoteTemplateJson   String?
   invoiceTemplateJson String?

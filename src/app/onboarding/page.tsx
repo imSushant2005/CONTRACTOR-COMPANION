@@ -48,11 +48,8 @@ export default function OnboardingPage() {
                 router.push('/app/dashboard')
                 return
             }
-            // Redirect to Stripe checkout
-            const res = await fetch('/api/stripe/checkout', { method: 'POST' })
-            if (!res.ok) throw new Error('Stripe setup failed.')
-            const data = await res.json()
-            window.location.href = data.url
+            // Temporarily skip Stripe checkout and go straight to the dashboard
+            router.push('/app/dashboard')
         } catch (e: any) {
             alert(e.message)
             setLoading(false)
